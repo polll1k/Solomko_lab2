@@ -15,4 +15,6 @@ public:
     void input();
     void print() const;
     void setRepair(bool value);
+    bool matchesName(const std::string& text) const;
+    bool matchesRepair(bool value) const;   
 };
