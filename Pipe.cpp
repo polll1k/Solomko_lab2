@@ -64,3 +64,30 @@ bool Pipe::matchesName(const string& text) const {
 bool Pipe::matchesRepair(bool value) const {
     return inRepair == value;
 }
+ostream& operator<<(ostream& out,const Pipe& pipe) {
+    out<<pipe.id<<endl;
+    out<<pipe.name<<endl;
+    out<<pipe.length<<endl;
+    out<<pipe.diameter<<endl;
+    out<<pipe.inRepair<<endl;
+    return out;
+}
+
+istream& operator>>(istream& in,Pipe& pipe) {
+    int repair;
+    in>>pipe.id;
+    in.ignore(100,'\n');
+    getline(in,pipe.name);
+    in>>pipe.length;
+    in>>pipe.diameter;
+    in>>repair;
+    in.ignore(100,'\n');
+
+    if (repair==0 || repair==1) {
+        pipe.inRepair=repair;
+    }
+    else {
+        in.setstate(ios::failbit);
+    }
+    return in;
+}

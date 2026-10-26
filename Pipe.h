@@ -17,4 +17,6 @@ public:
     void setRepair(bool value);
     bool matchesName(const std::string& text) const;
     bool matchesRepair(bool value) const;   
+    friend std::ostream& operator<<(std::ostream& out,const Pipe& pipe);
+    friend std::istream& operator>>(std::istream& in,Pipe& pipe);
 };
