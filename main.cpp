@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include "Pipe.h"
+#include "Logger.h"
 using namespace std;
 
 void savePipes(const map<int,Pipe>& pipes) {
@@ -66,6 +67,7 @@ void loadPipes(map<int,Pipe>& pipes) {
 int main() {
     map<int,Pipe> pipes;
     int choice;
+    Logger::write("Запуск программы");
     while (true) {
         cout<<endl;
         cout<<"1. Добавить трубу"<<endl;
@@ -82,7 +84,9 @@ int main() {
             cin>>choice;
         }
         cin.ignore(100,'\n');
+        Logger::write("Выбран пункт меню "+to_string(choice));
         if (choice==0) {
+            Logger::write("Выход из программы");
             break;
         }
         if (choice==1) {
@@ -90,6 +94,7 @@ int main() {
             pipe.input();
             pipes.emplace(pipe.getId(),pipe);
             cout<<"Труба добавлена. ID: "<<pipe.getId()<<endl;
+            Logger::write("Добавлена труба ID "+to_string(pipe.getId()));
         }
         else if (choice==2) {
             if (pipes.empty()) {
@@ -138,6 +143,7 @@ int main() {
                         }
                     }
                 }
+                Logger::write("Выполнен поиск труб");
                 if (foundIds.empty()) {
                     cout<<"Ничего не найдено"<<endl;
                 }
@@ -182,12 +188,15 @@ int main() {
                         for (int id:selectedIds) {
                             if (action==1) {
                                 pipes.at(id).setRepair(true);
+                                Logger::write("Труба ID "+to_string(id)+" отправлена в ремонт");
                             }
                             else if (action==2) {
                                 pipes.at(id).setRepair(false);
+                                Logger::write("Труба ID "+to_string(id)+" выведена из ремонта");
                             }
                             else if (action==3) {
                                 pipes.erase(id);
+                                Logger::write("Удалена труба ID "+to_string(id));
                             }
                         }
                     }
@@ -196,9 +205,11 @@ int main() {
         }
         else if (choice==4) {
             savePipes(pipes);
+            Logger::write("Сохранение данных");
         }
         else if (choice==5) {
             loadPipes(pipes);
+            Logger::write("Загрузка данных");
         }
     }
     return 0;
