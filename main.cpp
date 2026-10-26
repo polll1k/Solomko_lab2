@@ -1,26 +1,87 @@
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <vector>
 #include "Pipe.h"
 using namespace std;
 
+void savePipes(const map<int,Pipe>& pipes) {
+    string filename;
+    cout<<"Введите имя файла: ";
+    getline(cin,filename);
+    ofstream file(filename);
+    if (!file) {
+        cout<<"Ошибка файла"<<endl;
+        return;
+    }
+    if (pipes.empty()) {
+        file<<0<<endl;
+    }
+    else {
+        file<<1<<endl;
+        file<<pipes.size()<<endl;
+        for (const auto& pair:pipes) {
+            file<<pair.second;
+        }
+    }
+    cout<<"Данные сохранены"<<endl;
+}
+
+void loadPipes(map<int,Pipe>& pipes) {
+    string filename;
+    cout<<"Введите имя файла: ";
+    getline(cin,filename);
+    ifstream file(filename);
+    if (!file) {
+        cout<<"Файл не найден"<<endl;
+        return;
+    }
+    int marker;
+    file>>marker;
+    if (marker==0) {
+        pipes.clear();
+        cout<<"Труб в файле нет"<<endl;
+        return;
+    }
+    if (marker!=1) {
+        cout<<"Ошибка файла"<<endl;
+        return;
+    }
+    int count;
+    file>>count;
+    file.ignore(100,'\n');
+    pipes.clear();
+    for (int i=0;i<count;i++) {
+        Pipe pipe;
+        file>>pipe;
+        if (file.fail()) {
+            cout<<"Ошибка чтения"<<endl;
+            return;
+        }
+        pipes.emplace(pipe.getId(),pipe);
+    }
+    cout<<"Данные загружены"<<endl;
+}
+
 int main() {
-    map<int, Pipe> pipes;
+    map<int,Pipe> pipes;
     int choice;
     while (true) {
         cout<<endl;
         cout<<"1. Добавить трубу"<<endl;
         cout<<"2. Просмотреть все трубы"<<endl;
         cout<<"3. Поиск труб"<<endl;
+        cout<<"4. Сохранить"<<endl;
+        cout<<"5. Загрузить"<<endl;
         cout<<"0. Выход"<<endl;
         cin>>choice;
-        while (cin.fail() || choice<0 || choice>3) {
+        while (cin.fail() || choice<0 || choice>5) {
             cin.clear();
-            cin.ignore(100, '\n');
+            cin.ignore(100,'\n');
             cout<<"Введите пункт меню еще раз: ";
             cin>>choice;
         }
-        cin.ignore(100, '\n');
+        cin.ignore(100,'\n');
         if (choice==0) {
             break;
         }
@@ -51,8 +112,7 @@ int main() {
                 cout<<"1. По названию"<<endl;
                 cout<<"2. По ремонту"<<endl;
                 cin>>searchChoice;
-                cin.ignore(100, '\n');
-
+                cin.ignore(100,'\n');
                 if (searchChoice==1) {
                     string text;
                     cout<<"Введите название: ";
@@ -69,7 +129,7 @@ int main() {
                     int repair;
                     cout<<"В ремонте? 1/0: ";
                     cin>>repair;
-                    cin.ignore(100, '\n');
+                    cin.ignore(100,'\n');
                     for (const auto& pair:pipes) {
                         if (pair.second.matchesRepair(repair)) {
                             pair.second.print();
@@ -87,7 +147,6 @@ int main() {
                     cout<<"1. Изменить все найденные"<<endl;
                     cout<<"2. Выбрать по ID"<<endl;
                     cin>>editChoice;
-
                     if (editChoice==1) {
                         selectedIds=foundIds;
                     }
@@ -135,6 +194,11 @@ int main() {
                 }
             }
         }
+        else if (choice==4) {
+            savePipes(pipes);
+        }
+        else if (choice==5) {
+            loadPipes(pipes);
+        }
     }
     return 0;
-}
