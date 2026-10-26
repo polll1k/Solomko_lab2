@@ -16,7 +16,8 @@ public:
     void print() const;
     void setRepair(bool value);
     bool matchesName(const std::string& text) const;
-    bool matchesRepair(bool value) const;   
+    bool matchesRepair(bool value) const;
+    static void updateNextId(int id);
     friend std::ostream& operator<<(std::ostream& out,const Pipe& pipe);
     friend std::istream& operator>>(std::istream& in,Pipe& pipe);
 };

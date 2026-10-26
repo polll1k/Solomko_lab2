@@ -7,7 +7,7 @@
 #include "Logger.h"
 using namespace std;
 
-void savePipes(const map<int,Pipe>& pipes) {
+void saveData(const map<int,Pipe>& pipes,const map<int,CompressorStation>& stations) {
     string filename;
     cout<<"Введите имя файла: ";
     getline(cin,filename);
@@ -26,10 +26,20 @@ void savePipes(const map<int,Pipe>& pipes) {
             file<<pair.second;
         }
     }
+    if (stations.empty()) {
+        file<<0<<endl;
+    }
+    else {
+        file<<1<<endl;
+        file<<stations.size()<<endl;
+        for (const auto& pair:stations) {
+            file<<pair.second;
+        }
+    }
     cout<<"Данные сохранены"<<endl;
 }
 
-void loadPipes(map<int,Pipe>& pipes) {
+void loadData(map<int,Pipe>& pipes,map<int,CompressorStation>& stations) {
     string filename;
     cout<<"Введите имя файла: ";
     getline(cin,filename);
@@ -39,29 +49,55 @@ void loadPipes(map<int,Pipe>& pipes) {
         return;
     }
     int marker;
+    int count;
+    map<int,Pipe> newPipes;
+    map<int,CompressorStation> newStations;
+
     file>>marker;
-    if (marker==0) {
-        pipes.clear();
-        cout<<"Труб в файле нет"<<endl;
-        return;
+    if (marker==1) {
+        file>>count;
+        file.ignore(100,'\n');
+        for (int i=0;i<count;i++) {
+            Pipe pipe;
+            file>>pipe;
+            if (file.fail()) {
+                cout<<"Ошибка чтения труб"<<endl;
+                return;
+            }
+            newPipes.emplace(pipe.getId(),pipe);
+        }
     }
-    if (marker!=1) {
+    else if (marker==0) {
+        file.ignore(100,'\n');
+    }
+    else {
         cout<<"Ошибка файла"<<endl;
         return;
     }
-    int count;
-    file>>count;
-    file.ignore(100,'\n');
-    pipes.clear();
-    for (int i=0;i<count;i++) {
-        Pipe pipe;
-        file>>pipe;
-        if (file.fail()) {
-            cout<<"Ошибка чтения"<<endl;
-            return;
+
+    file>>marker;
+    if (marker==1) {
+        file>>count;
+        file.ignore(100,'\n');
+        for (int i=0;i<count;i++) {
+            CompressorStation cs;
+            file>>cs;
+            if (file.fail()) {
+                cout<<"Ошибка чтения КС"<<endl;
+                return;
+            }
+            newStations.emplace(cs.getId(),cs);
         }
-        pipes.emplace(pipe.getId(),pipe);
     }
+    else if (marker==0) {
+        file.ignore(100,'\n');
+    }
+    else {
+        cout<<"Ошибка файла"<<endl;
+        return;
+    }
+    pipes=newPipes;
+    stations=newStations;
     cout<<"Данные загружены"<<endl;
 }
 
@@ -70,6 +106,7 @@ int main() {
     map<int,CompressorStation> stations;
     int choice;
     Logger::write("Запуск программы");
+
     while (true) {
         cout<<endl;
         cout<<"1. Добавить трубу"<<endl;
@@ -77,8 +114,8 @@ int main() {
         cout<<"3. Просмотреть все объекты"<<endl;
         cout<<"4. Поиск труб"<<endl;
         cout<<"5. Поиск КС"<<endl;
-        cout<<"6. Сохранить трубы"<<endl;
-        cout<<"7. Загрузить трубы"<<endl;
+        cout<<"6. Сохранить"<<endl;
+        cout<<"7. Загрузить"<<endl;
         cout<<"0. Выход"<<endl;
         cin>>choice;
         while (cin.fail() || choice<0 || choice>7) {
@@ -249,13 +286,11 @@ int main() {
                         }
                     }
                 }
-
                 else if (searchChoice==2) {
                     double percent;
                     cout<<"Введите минимальный процент: ";
                     cin>>percent;
                     cin.ignore(100,'\n');
-
                     for (const auto& pair:stations) {
                         if (pair.second.matchesIdlePercent(percent)) {
                             pair.second.print();
@@ -308,15 +343,14 @@ int main() {
         }
 
         else if (choice==6) {
-            savePipes(pipes);
-            Logger::write("Сохранение труб");
+            saveData(pipes,stations);
+            Logger::write("Сохранение данных");
         }
 
         else if (choice==7) {
-            loadPipes(pipes);
-            Logger::write("Загрузка труб");
+            loadData(pipes,stations);
+            Logger::write("Загрузка данных");
         }
     }
-
     return 0;
 }

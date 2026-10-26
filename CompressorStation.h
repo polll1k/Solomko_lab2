@@ -21,7 +21,7 @@ public:
     double getIdlePercent() const;
     bool matchesName(const std::string& text) const;
     bool matchesIdlePercent(double percent) const;
-
+    static void updateNextId(int id);
     friend std::ostream& operator<<(std::ostream& out,const CompressorStation& cs);
     friend std::istream& operator>>(std::istream& in,CompressorStation& cs);
 };
