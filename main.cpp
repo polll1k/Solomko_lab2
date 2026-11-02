@@ -11,6 +11,7 @@ void saveData(const map<int,Pipe>& pipes,const map<int,CompressorStation>& stati
     string filename;
     cout<<"Введите имя файла: ";
     getline(cin,filename);
+    Logger::write(filename);
     ofstream file(filename);
     if (!file) {
         cout<<"Ошибка файла"<<endl;
@@ -43,6 +44,7 @@ void loadData(map<int,Pipe>& pipes,map<int,CompressorStation>& stations) {
     string filename;
     cout<<"Введите имя файла: ";
     getline(cin,filename);
+    Logger::write(filename);
     ifstream file(filename);
     if (!file) {
         cout<<"Файл не найден"<<endl;
@@ -105,7 +107,6 @@ int main() {
     map<int,Pipe> pipes;
     map<int,CompressorStation> stations;
     int choice;
-    Logger::write("Запуск программы");
 
     while (true) {
         cout<<endl;
@@ -124,11 +125,10 @@ int main() {
             cout<<"Введите пункт меню еще раз: ";
             cin>>choice;
         }
+        Logger::write(choice);
         cin.ignore(100,'\n');
-        Logger::write("Выбран пункт меню "+to_string(choice));
 
         if (choice==0) {
-            Logger::write("Выход из программы");
             break;
         }
 
@@ -137,7 +137,6 @@ int main() {
             pipe.input();
             pipes.emplace(pipe.getId(),pipe);
             cout<<"Труба добавлена. ID: "<<pipe.getId()<<endl;
-            Logger::write("Добавлена труба ID "+to_string(pipe.getId()));
         }
 
         else if (choice==2) {
@@ -145,17 +144,18 @@ int main() {
             cs.input();
             stations.emplace(cs.getId(),cs);
             cout<<"КС добавлена. ID: "<<cs.getId()<<endl;
-            Logger::write("Добавлена КС ID "+to_string(cs.getId()));
         }
 
         else if (choice==3) {
             if (pipes.empty() && stations.empty()) {
                 cout<<"Объектов нет"<<endl;
             }
+
             for (const auto& pair:pipes) {
                 pair.second.print();
                 cout<<endl;
             }
+
             for (const auto& pair:stations) {
                 pair.second.print();
                 cout<<endl;
@@ -169,15 +169,21 @@ int main() {
             else {
                 int searchChoice;
                 vector<int> foundIds;
+
                 cout<<"1. По названию"<<endl;
                 cout<<"2. По ремонту"<<endl;
+
                 cin>>searchChoice;
+                Logger::write(searchChoice);
                 cin.ignore(100,'\n');
 
                 if (searchChoice==1) {
                     string text;
+
                     cout<<"Введите название: ";
                     getline(cin,text);
+                    Logger::write(text);
+
                     for (const auto& pair:pipes) {
                         if (pair.second.matchesName(text)) {
                             pair.second.print();
@@ -186,11 +192,15 @@ int main() {
                         }
                     }
                 }
+
                 else if (searchChoice==2) {
                     int repair;
+
                     cout<<"В ремонте? 1/0: ";
                     cin>>repair;
+                    Logger::write(repair);
                     cin.ignore(100,'\n');
+
                     for (const auto& pair:pipes) {
                         if (pair.second.matchesRepair(repair)) {
                             pair.second.print();
@@ -206,28 +216,39 @@ int main() {
                 else {
                     int editChoice;
                     vector<int> selectedIds;
+
                     cout<<"1. Изменить все найденные"<<endl;
                     cout<<"2. Выбрать по ID"<<endl;
+
                     cin>>editChoice;
+                    Logger::write(editChoice);
 
                     if (editChoice==1) {
                         selectedIds=foundIds;
                     }
+
                     else if (editChoice==2) {
                         int id;
+
                         cout<<"Введите ID труб, для окончания 0"<<endl;
+
                         while (true) {
                             cout<<"ID: ";
                             cin>>id;
+                            Logger::write(id);
+
                             if (id==0) {
                                 break;
                             }
+
                             bool found=false;
+
                             for (int foundId:foundIds) {
                                 if (foundId==id) {
                                     found=true;
                                 }
                             }
+
                             if (found) {
                                 selectedIds.push_back(id);
                             }
@@ -239,22 +260,23 @@ int main() {
 
                     if (!selectedIds.empty()) {
                         int action;
+
                         cout<<"1. В ремонт"<<endl;
                         cout<<"2. Из ремонта"<<endl;
                         cout<<"3. Удалить"<<endl;
+
                         cin>>action;
+                        Logger::write(action);
+
                         for (int id:selectedIds) {
                             if (action==1) {
                                 pipes.at(id).setRepair(true);
-                                Logger::write("Труба ID "+to_string(id)+" отправлена в ремонт");
                             }
                             else if (action==2) {
                                 pipes.at(id).setRepair(false);
-                                Logger::write("Труба ID "+to_string(id)+" выведена из ремонта");
                             }
                             else if (action==3) {
                                 pipes.erase(id);
-                                Logger::write("Удалена труба ID "+to_string(id));
                             }
                         }
                     }
@@ -272,12 +294,14 @@ int main() {
                 cout<<"1. По названию"<<endl;
                 cout<<"2. По проценту незадействованных цехов"<<endl;
                 cin>>searchChoice;
+                Logger::write(searchChoice);
                 cin.ignore(100,'\n');
-
                 if (searchChoice==1) {
                     string text;
                     cout<<"Введите название: ";
                     getline(cin,text);
+                    Logger::write(text);
+
                     for (const auto& pair:stations) {
                         if (pair.second.matchesName(text)) {
                             pair.second.print();
@@ -290,6 +314,7 @@ int main() {
                     double percent;
                     cout<<"Введите минимальный процент: ";
                     cin>>percent;
+                    Logger::write(percent);
                     cin.ignore(100,'\n');
                     for (const auto& pair:stations) {
                         if (pair.second.matchesIdlePercent(percent)) {
@@ -307,32 +332,28 @@ int main() {
                     int id;
                     cout<<"Введите ID КС: ";
                     cin>>id;
-
+                    Logger::write(id);
                     bool found=false;
                     for (int foundId:foundIds) {
                         if (foundId==id) {
                             found=true;
                         }
                     }
-
                     if (found) {
                         int action;
                         cout<<"1. Запустить цех"<<endl;
                         cout<<"2. Остановить цех"<<endl;
                         cout<<"3. Удалить КС"<<endl;
                         cin>>action;
-
+                        Logger::write(action);
                         if (action==1) {
                             stations.at(id).startWorkshop();
-                            Logger::write("Запущен цех на КС ID "+to_string(id));
                         }
                         else if (action==2) {
                             stations.at(id).stopWorkshop();
-                            Logger::write("Остановлен цех на КС ID "+to_string(id));
                         }
                         else if (action==3) {
                             stations.erase(id);
-                            Logger::write("Удалена КС ID "+to_string(id));
                         }
                     }
                     else {
@@ -344,12 +365,10 @@ int main() {
 
         else if (choice==6) {
             saveData(pipes,stations);
-            Logger::write("Сохранение данных");
         }
 
         else if (choice==7) {
             loadData(pipes,stations);
-            Logger::write("Загрузка данных");
         }
     }
     return 0;

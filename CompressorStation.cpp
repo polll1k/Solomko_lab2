@@ -1,4 +1,5 @@
 #include "CompressorStation.h"
+#include "Logger.h"
 using namespace std;
 
 int CompressorStation::nextId=1;
@@ -17,6 +18,7 @@ string CompressorStation::getName() const {
 void CompressorStation::input() {
     cout<<"Название КС: ";
     getline(cin>>ws,name);
+    Logger::write(name);
     cout<<"Количество цехов: ";
     cin>>workshops;
     while (cin.fail() || workshops<=0) {
@@ -25,6 +27,7 @@ void CompressorStation::input() {
         cout<<"Введите количество цехов еще раз: ";
         cin>>workshops;
     }
+    Logger::write(workshops);
     cin.ignore(100,'\n');
     cout<<"Цехов в работе: ";
     cin>>workshopsInWork;
@@ -34,6 +37,7 @@ void CompressorStation::input() {
         cout<<"Введите количество работающих цехов еще раз: ";
         cin>>workshopsInWork;
     }
+    Logger::write(workshopsInWork);
     cin.ignore(100,'\n');
     cout<<"Класс: ";
     cin>>stationClass;
@@ -43,6 +47,7 @@ void CompressorStation::input() {
         cout<<"Введите класс еще раз: ";
         cin>>stationClass;
     }
+    Logger::write(stationClass);
     cin.ignore(100,'\n');
 }
 
@@ -101,7 +106,6 @@ ostream& operator<<(ostream& out,const CompressorStation& cs) {
     out<<cs.stationClass<<endl;
     return out;
 }
-
 istream& operator>>(istream& in,CompressorStation& cs) {
     in>>cs.id;
     in.ignore(100,'\n');

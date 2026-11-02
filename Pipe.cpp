@@ -1,4 +1,5 @@
 #include "Pipe.h"
+#include "Logger.h"
 using namespace std;
 
 int Pipe::nextId=1;
@@ -14,6 +15,7 @@ void Pipe::input() {
     int repair;
     cout<<"Название: ";
     getline(cin>>ws,name);
+    Logger::write(name);
     cout<<"Длина: ";
     cin>>length;
     while (cin.fail() || length<=0) {
@@ -22,6 +24,7 @@ void Pipe::input() {
         cout<<"Введите длину еще раз: ";
         cin>>length;
     }
+    Logger::write(length);
     cin.ignore(100,'\n');
     cout<<"Диаметр: ";
     cin>>diameter;
@@ -31,6 +34,7 @@ void Pipe::input() {
         cout<<"Введите диаметр еще раз: ";
         cin>>diameter;
     }
+    Logger::write(diameter);
     cin.ignore(100,'\n');
     cout<<"В ремонте (1/0): ";
     cin>>repair;
@@ -40,6 +44,7 @@ void Pipe::input() {
         cout<<"Введите 1 или 0: ";
         cin>>repair;
     }
+    Logger::write(repair);
     cin.ignore(100,'\n');
     inRepair=repair;
 }
